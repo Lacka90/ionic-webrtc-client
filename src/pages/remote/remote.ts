@@ -1,7 +1,7 @@
 import { Component, ViewChild, OnDestroy } from '@angular/core';
-import { NavController, ViewController } from 'ionic-angular';
+import { NavController, NavParams, ViewController } from 'ionic-angular';
+import { HomePage } from '../home/home';
 import * as Peer from 'simple-peer';
-import { Remote } from '../remote/remote';
 
 const VIDEO_CONSTRAINTS = {
   audio: true,
@@ -12,17 +12,20 @@ const VIDEO_CONSTRAINTS = {
 };
 
 @Component({
-  selector: 'page-home',
-  templateUrl: 'home.html'
+  selector: 'page-remote',
+  templateUrl: 'remote.html',
 })
-export class HomePage implements OnDestroy {
+export class Remote implements OnDestroy {
   @ViewChild('localVideo') localVideo;
+
+  @ViewChild('connectButton') connectButton: HTMLButtonElement;
 
   private peer;
   private connectionString = 'asdasdasd';
 
   constructor(
     public navCtrl: NavController,
+    public navParams: NavParams,
     private viewCtrl: ViewController
   ) {
     navigator.mediaDevices.getUserMedia(VIDEO_CONSTRAINTS)
@@ -34,10 +37,9 @@ export class HomePage implements OnDestroy {
       });
 
       this.peer.on('signal', (data) => {
-        // persist data on DB
         this.connectionString = JSON.stringify(data);
         console.log(this.connectionString);
-      })
+      });
 
       this.peer.on('stream', (stream) => {
         this.localVideo.nativeElement.src = window.URL.createObjectURL(stream);
@@ -54,7 +56,7 @@ export class HomePage implements OnDestroy {
     this.peer.signal(JSON.parse(event.value));
   }
 
-  toRemote() {
-    this.navCtrl.push(Remote);
+  toHome() {
+    this.navCtrl.push(HomePage);
   }
 }

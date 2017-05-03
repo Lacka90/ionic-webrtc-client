@@ -7,5 +7,11 @@
 </ion-header>
 
 <ion-content padding>
+  <button (click)="toRemote()">ToRemote</button>
   Test Page
+
+  <video #localVideo autoplay muted></video>
+  <textarea #connStr></textarea>
+  <button (click)="connect(connStr)">Connect</button>
+
 </ion-content>
