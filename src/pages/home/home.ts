@@ -2,6 +2,7 @@ import { Component, ViewChild, OnDestroy } from '@angular/core';
 import { NavController, ViewController } from 'ionic-angular';
 import { UserService } from '../../common/user';
 import * as Peer from 'simple-peer';
+import 'rxjs/add/operator/toPromise';
 
 const VIDEO_CONSTRAINTS = {
   audio: true,
@@ -17,7 +18,9 @@ const VIDEO_CONSTRAINTS = {
 })
 export class HomePage implements OnDestroy {
   @ViewChild('localVideo') localVideo;
+  @ViewChild('textarea') textarea;
 
+  private user = {};
   private peer;
 
   constructor(
@@ -25,28 +28,48 @@ export class HomePage implements OnDestroy {
     private viewCtrl: ViewController,
     private userService: UserService
   ) {
+    this.userService.getUser().subscribe(({ user }) => {
+      this.user = user;
+    });
     navigator.mediaDevices.getUserMedia(VIDEO_CONSTRAINTS)
     .then((stream) => {
       this.peer = new Peer({
         initiator: this.viewCtrl.name === 'HomePage',
         trickle: false,
+        reconnectTimer: 60000,
         stream,
       });
 
       this.peer.on('signal', (data) => {
         const connection = JSON.stringify(data);
-        console.log(connection);
-        this.userService.openConnection(this.userService.user._id, connection);
+
+        this.userService.offerRoom(connection).subscribe((result) => {
+          this.getRoom().then((room) => {
+            this.connect(room.answer);
+          });
+        });
       });
 
       this.peer.on('stream', (stream) => {
         this.localVideo.nativeElement.src = window.URL.createObjectURL(stream);
         this.localVideo.nativeElement.play();
       });
+    })
+    .catch(err => console.error(err));
+  }
+
+  getRoom() {
+    return this.userService.getRoom().toPromise().then(({ room }) => {
+      if (!room.answer) {
+        return this.getRoom();
+      }
+      return room;
     });
   }
 
-  ngOnDestroy() {
-    this.userService.closeConnection(this.userService.user._id);
+  connect(answer: string) {
+    this.peer.signal(JSON.parse(answer));
   }
+
+  ngOnDestroy() {}
 }

@@ -27,27 +27,32 @@ export class Remote implements OnDestroy {
     private viewCtrl: ViewController,
     private userService: UserService
   ) {
-    this.userService.getAvailableUsers().subscribe((response) => {
-      this.users = response.users;
+    this.userService.getAvailableUsers().subscribe(({ users }) => {
+      this.users = users;
     });
     navigator.mediaDevices.getUserMedia(VIDEO_CONSTRAINTS)
     .then((stream) => {
       this.peer = new Peer({
         initiator: this.viewCtrl.name === 'HomePage',
         trickle: false,
+        reconnectTimer: 60000,
         stream,
       });
 
       this.peer.on('signal', (data) => {
         const connection = JSON.stringify(data);
-        this.connectData(connection);
+        console.log("REMOTE", connection);
+        this.userService.answerRoom(connection).subscribe((result) => {
+          console.log(result);
+        });
       });
 
       this.peer.on('stream', (stream) => {
         this.localVideo.nativeElement.src = window.URL.createObjectURL(stream);
         this.localVideo.nativeElement.play();
       })
-    });
+    })
+    .catch(err => console.error(err));
   }
 
   ngOnDestroy() {
@@ -56,10 +61,8 @@ export class Remote implements OnDestroy {
 
   connect(user) {
     this.selectedUser = user;
-    this.peer.signal(user.connection);
-  }
-
-  connectData(connection) {
-    this.peer.signal(connection);
+    return this.userService.getRoomById(user._id).toPromise().then(({ room }) => {
+      this.peer.signal(room.offer);
+    });
   }
 }

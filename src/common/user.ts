@@ -4,19 +4,18 @@ import 'rxjs/add/operator/map';
 
 @Injectable()
 export class UserService {
-  public user = null;
-
   constructor(public api: ApiService) {}
 
+  getUser() {
+    return this.api.whoami();
+  }
+
   login(username: string, password: string) {
-    return this.api.login(username, password).subscribe((response) => {
-      this.user = response.user[0];
-      return this.user;
-    });
+    return this.api.login(username, password);
   }
 
   logout() {
-    this.user = null;
+    return window.localStorage.removeItem('token');
   }
 
   getAvailableUsers() {
@@ -24,15 +23,22 @@ export class UserService {
   }
 
   register(username: string, password: string) {
-    this.login(username, password);
+    return this.login(username, password);
   }
 
-  openConnection(userId: string, connection: string) {
-    this.api.openConnection(userId, connection);
+  offerRoom(connection: string) {
+    return this.api.offerRoom(connection);
   }
 
-  closeConnection(userId: string) {
-    this.api.closeConnection(userId);
+  answerRoom(connection: string) {
+    return this.api.answerRoom(connection);
   }
 
+  getRoom() {
+    return this.api.getRoom();
+  }
+
+  getRoomById(userId: string) {
+    return this.api.getRoomById(userId);
+  }
 }

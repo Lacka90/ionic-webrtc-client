@@ -5,7 +5,7 @@
 </ion-header>
 
 <ion-content padding>
-  <ion-list *ngIf="!userService.user">
+  <ion-list *ngIf="!user">
 
     <ion-item>
       <ion-label floating>Username</ion-label>
@@ -19,11 +19,11 @@
 
   </ion-list>
 
-  <div padding *ngIf="!userService.user">
+  <div padding *ngIf="!user">
     <button ion-button full (click)="login()">Sign in</button>
   </div>
 
-  <div *ngIf="userService.user">
+  <div *ngIf="user">
     <button ion-button full (click)="startVideo()">Start Video Receive</button>
     <button ion-button full (click)="userList()">User list</button>
     <hr>
