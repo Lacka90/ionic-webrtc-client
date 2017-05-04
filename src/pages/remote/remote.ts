@@ -1,6 +1,5 @@
 import { Component, ViewChild, OnDestroy } from '@angular/core';
 import { NavController, NavParams, ViewController } from 'ionic-angular';
-import { HomePage } from '../home/home';
 import { UserService } from '../../common/user';
 import * as Peer from 'simple-peer';
 
