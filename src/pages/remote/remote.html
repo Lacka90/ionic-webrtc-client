@@ -14,9 +14,13 @@
 
 
 <ion-content padding>
-  <button (click)="toHome()">ToHome</button>
-
   <video #localVideo autoplay muted></video>
-  <textarea #connStr></textarea>
-  <button (click)="connect(connStr)">Connect</button>
+  <div *ngIf="!selectedUser">
+    <ion-list>
+      <ion-item *ngFor="let user of users" (click)="connect(user)">
+        {{ user.username }}
+        {{ user.connection }}
+      </ion-item>
+    </ion-list>
+  </div>
 </ion-content>

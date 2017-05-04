@@ -1,6 +1,7 @@
 import { Component, ViewChild, OnDestroy } from '@angular/core';
 import { NavController, NavParams, ViewController } from 'ionic-angular';
 import { HomePage } from '../home/home';
+import { UserService } from '../../common/user';
 import * as Peer from 'simple-peer';
 
 const VIDEO_CONSTRAINTS = {
@@ -17,17 +18,19 @@ const VIDEO_CONSTRAINTS = {
 })
 export class Remote implements OnDestroy {
   @ViewChild('localVideo') localVideo;
-
-  @ViewChild('connectButton') connectButton: HTMLButtonElement;
-
+  private selectedUser;
+  private users = null;
   private peer;
-  private connectionString = 'asdasdasd';
 
   constructor(
     public navCtrl: NavController,
     public navParams: NavParams,
-    private viewCtrl: ViewController
+    private viewCtrl: ViewController,
+    private userService: UserService
   ) {
+    this.userService.getAvailableUsers().subscribe((response) => {
+      this.users = response.users;
+    });
     navigator.mediaDevices.getUserMedia(VIDEO_CONSTRAINTS)
     .then((stream) => {
       this.peer = new Peer({
@@ -37,8 +40,8 @@ export class Remote implements OnDestroy {
       });
 
       this.peer.on('signal', (data) => {
-        this.connectionString = JSON.stringify(data);
-        console.log(this.connectionString);
+        const connection = JSON.stringify(data);
+        this.connectData(connection);
       });
 
       this.peer.on('stream', (stream) => {
@@ -52,11 +55,12 @@ export class Remote implements OnDestroy {
     // remove data from DB
   }
 
-  connect(event: HTMLTextAreaElement) {
-    this.peer.signal(JSON.parse(event.value));
+  connect(user) {
+    this.selectedUser = user;
+    this.peer.signal(user.connection);
   }
 
-  toHome() {
-    this.navCtrl.push(HomePage);
+  connectData(connection) {
+    this.peer.signal(connection);
   }
 }

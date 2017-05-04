@@ -1,7 +1,7 @@
 import { Component, ViewChild, OnDestroy } from '@angular/core';
 import { NavController, ViewController } from 'ionic-angular';
+import { UserService } from '../../common/user';
 import * as Peer from 'simple-peer';
-import { Remote } from '../remote/remote';
 
 const VIDEO_CONSTRAINTS = {
   audio: true,
@@ -19,11 +19,11 @@ export class HomePage implements OnDestroy {
   @ViewChild('localVideo') localVideo;
 
   private peer;
-  private connectionString = 'asdasdasd';
 
   constructor(
     public navCtrl: NavController,
-    private viewCtrl: ViewController
+    private viewCtrl: ViewController,
+    private userService: UserService
   ) {
     navigator.mediaDevices.getUserMedia(VIDEO_CONSTRAINTS)
     .then((stream) => {
@@ -34,27 +34,19 @@ export class HomePage implements OnDestroy {
       });
 
       this.peer.on('signal', (data) => {
-        // persist data on DB
-        this.connectionString = JSON.stringify(data);
-        console.log(this.connectionString);
-      })
+        const connection = JSON.stringify(data);
+        console.log(connection);
+        this.userService.openConnection(this.userService.user._id, connection);
+      });
 
       this.peer.on('stream', (stream) => {
         this.localVideo.nativeElement.src = window.URL.createObjectURL(stream);
         this.localVideo.nativeElement.play();
-      })
+      });
     });
   }
 
   ngOnDestroy() {
-    // remove data from DB
-  }
-
-  connect(event: HTMLTextAreaElement) {
-    this.peer.signal(JSON.parse(event.value));
-  }
-
-  toRemote() {
-    this.navCtrl.push(Remote);
+    this.userService.closeConnection(this.userService.user._id);
   }
 }
