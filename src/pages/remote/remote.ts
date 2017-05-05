@@ -30,8 +30,8 @@ export class Remote implements OnDestroy {
     this.userService.getAvailableUsers().subscribe(({ users }) => {
       this.users = users;
     });
-    navigator.mediaDevices.getUserMedia(VIDEO_CONSTRAINTS)
-    .then((stream) => {
+
+    navigator.getUserMedia(VIDEO_CONSTRAINTS, (stream) => {
       this.peer = new Peer({
         initiator: this.viewCtrl.name === 'HomePage',
         trickle: false,
@@ -42,7 +42,7 @@ export class Remote implements OnDestroy {
       this.peer.on('signal', (data) => {
         const connection = JSON.stringify(data);
         console.log("REMOTE", connection);
-        this.userService.answerRoom(connection).subscribe((result) => {
+        this.userService.answerRoom(this.selectedUser._id, connection).subscribe((result) => {
           console.log(result);
         });
       });
@@ -51,8 +51,7 @@ export class Remote implements OnDestroy {
         this.localVideo.nativeElement.src = window.URL.createObjectURL(stream);
         this.localVideo.nativeElement.play();
       })
-    })
-    .catch(err => console.error(err));
+    }, err => console.error(err));
   }
 
   ngOnDestroy() {

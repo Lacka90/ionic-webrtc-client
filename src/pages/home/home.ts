@@ -28,11 +28,11 @@ export class HomePage implements OnDestroy {
     private viewCtrl: ViewController,
     private userService: UserService
   ) {
-    this.userService.getUser().subscribe(({ user }) => {
+    this.userService.getUser().then((user) => {
       this.user = user;
     });
-    navigator.mediaDevices.getUserMedia(VIDEO_CONSTRAINTS)
-    .then((stream) => {
+
+    navigator.getUserMedia(VIDEO_CONSTRAINTS, (stream) => {
       this.peer = new Peer({
         initiator: this.viewCtrl.name === 'HomePage',
         trickle: false,
@@ -54,8 +54,7 @@ export class HomePage implements OnDestroy {
         this.localVideo.nativeElement.src = window.URL.createObjectURL(stream);
         this.localVideo.nativeElement.play();
       });
-    })
-    .catch(err => console.error(err));
+    }, err => console.error(err));
   }
 
   getRoom() {

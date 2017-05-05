@@ -21,6 +21,7 @@
 
   <div padding *ngIf="!user">
     <button ion-button full (click)="login()">Sign in</button>
+    <button ion-button full (click)="goToSignup()">Sign up</button>
   </div>
 
   <div *ngIf="user">
