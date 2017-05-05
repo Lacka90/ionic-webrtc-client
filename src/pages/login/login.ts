@@ -3,6 +3,7 @@ import { NavController } from 'ionic-angular';
 import { UserService } from '../../common/user';
 import { HomePage } from '../../pages/home/home';
 import { Remote } from '../../pages/remote/remote';
+import { Signup } from '../../pages/signup/signup';
 
 @Component({
   selector: 'page-login',
@@ -25,8 +26,12 @@ export class Login implements OnInit {
     });
   }
 
+  goToSignup() {
+    this.navCtrl.push(Signup);
+  }
+
   getUser() {
-    this.userService.getUser().subscribe(({ user }) => {
+    this.userService.getUser().then((user) => {
       this.user = user;
     });
   }

@@ -2,7 +2,7 @@ import { Injectable } from '@angular/core';
 import { Http } from '@angular/http';
 import 'rxjs/add/operator/map';
 
-export const API_BASE = 'http://5e1b9e02.ngrok.io/api/v1';
+export const API_BASE = 'https://5da4f996.ngrok.io/api/v1';
 
 @Injectable()
 export class ApiService {
@@ -47,8 +47,8 @@ export class ApiService {
       .map((response) => response.json());
   }
 
-  answerRoom(connection: string) {
-    return this.http.put(`/user/room/answer`, { connection })
+  answerRoom(userId: string, connection: string) {
+    return this.http.put(`/user/room/answer`, { userId, connection })
       .map((response) => response.json());
   }
 

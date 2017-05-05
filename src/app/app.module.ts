@@ -11,6 +11,7 @@ import { MyApp } from './app.component';
 import { HomePage } from '../pages/home/home';
 import { Remote } from '../pages/remote/remote';
 import { Login } from '../pages/login/login';
+import { Signup } from '../pages/signup/signup';
 
 import { ApiService } from '../common/api';
 import { UserService } from '../common/user';
@@ -21,6 +22,7 @@ import { UserService } from '../common/user';
     HomePage,
     Remote,
     Login,
+    Signup,
   ],
   imports: [
     BrowserModule,
@@ -33,6 +35,7 @@ import { UserService } from '../common/user';
     HomePage,
     Remote,
     Login,
+    Signup,
   ],
   providers: [
     StatusBar,
