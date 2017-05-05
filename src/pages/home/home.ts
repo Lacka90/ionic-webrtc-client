@@ -1,7 +1,8 @@
 import { Component, ViewChild, OnDestroy } from '@angular/core';
 import { NavController, ViewController } from 'ionic-angular';
+import { UserService } from '../../common/user';
 import * as Peer from 'simple-peer';
-import { Remote } from '../remote/remote';
+import 'rxjs/add/operator/toPromise';
 
 const VIDEO_CONSTRAINTS = {
   audio: true,
@@ -17,44 +18,58 @@ const VIDEO_CONSTRAINTS = {
 })
 export class HomePage implements OnDestroy {
   @ViewChild('localVideo') localVideo;
+  @ViewChild('textarea') textarea;
 
+  private user = {};
   private peer;
-  private connectionString = 'asdasdasd';
 
   constructor(
     public navCtrl: NavController,
-    private viewCtrl: ViewController
+    private viewCtrl: ViewController,
+    private userService: UserService
   ) {
+    this.userService.getUser().subscribe(({ user }) => {
+      this.user = user;
+    });
     navigator.mediaDevices.getUserMedia(VIDEO_CONSTRAINTS)
     .then((stream) => {
       this.peer = new Peer({
         initiator: this.viewCtrl.name === 'HomePage',
         trickle: false,
+        reconnectTimer: 60000,
         stream,
       });
 
       this.peer.on('signal', (data) => {
-        // persist data on DB
-        this.connectionString = JSON.stringify(data);
-        console.log(this.connectionString);
-      })
+        const connection = JSON.stringify(data);
+
+        this.userService.offerRoom(connection).subscribe((result) => {
+          this.getRoom().then((room) => {
+            this.connect(room.answer);
+          });
+        });
+      });
 
       this.peer.on('stream', (stream) => {
         this.localVideo.nativeElement.src = window.URL.createObjectURL(stream);
         this.localVideo.nativeElement.play();
-      })
+      });
+    })
+    .catch(err => console.error(err));
+  }
+
+  getRoom() {
+    return this.userService.getRoom().toPromise().then(({ room }) => {
+      if (!room.answer) {
+        return this.getRoom();
+      }
+      return room;
     });
   }
 
-  ngOnDestroy() {
-    // remove data from DB
+  connect(answer: string) {
+    this.peer.signal(JSON.parse(answer));
   }
 
-  connect(event: HTMLTextAreaElement) {
-    this.peer.signal(JSON.parse(event.value));
-  }
-
-  toRemote() {
-    this.navCtrl.push(Remote);
-  }
+  ngOnDestroy() {}
 }

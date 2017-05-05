@@ -1,0 +1,32 @@
+<ion-header>
+  <ion-navbar>
+    <ion-title>Login</ion-title>
+  </ion-navbar>
+</ion-header>
+
+<ion-content padding>
+  <ion-list *ngIf="!user">
+
+    <ion-item>
+      <ion-label floating>Username</ion-label>
+      <ion-input [(ngModel)]="username" type="text"></ion-input>
+    </ion-item>
+
+    <ion-item>
+      <ion-label floating>Password</ion-label>
+      <ion-input [(ngModel)]="password" type="password"></ion-input>
+    </ion-item>
+
+  </ion-list>
+
+  <div padding *ngIf="!user">
+    <button ion-button full (click)="login()">Sign in</button>
+  </div>
+
+  <div *ngIf="user">
+    <button ion-button full (click)="startVideo()">Start Video Receive</button>
+    <button ion-button full (click)="userList()">User list</button>
+    <hr>
+    <button ion-button full (click)="logout()">Sign out</button>
+  </div>
+</ion-content>
