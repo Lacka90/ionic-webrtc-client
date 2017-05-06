@@ -18,6 +18,7 @@ const VIDEO_CONSTRAINTS = {
 })
 export class HomePage implements OnDestroy {
   @ViewChild('localVideo') localVideo;
+  @ViewChild('selfVideo') selfVideo;
   @ViewChild('textarea') textarea;
 
   private user = {};
@@ -33,6 +34,9 @@ export class HomePage implements OnDestroy {
     });
 
     navigator.getUserMedia(VIDEO_CONSTRAINTS, (stream) => {
+      this.selfVideo.nativeElement.src = window.URL.createObjectURL(stream);
+      this.selfVideo.nativeElement.play();
+
       this.peer = new Peer({
         initiator: this.viewCtrl.name === 'HomePage',
         trickle: false,

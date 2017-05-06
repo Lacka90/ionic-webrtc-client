@@ -17,6 +17,7 @@ const VIDEO_CONSTRAINTS = {
 })
 export class Remote implements OnDestroy {
   @ViewChild('localVideo') localVideo;
+  @ViewChild('selfVideo') selfVideo;
   private selectedUser;
   private users = null;
   private peer;
@@ -32,6 +33,9 @@ export class Remote implements OnDestroy {
     });
 
     navigator.getUserMedia(VIDEO_CONSTRAINTS, (stream) => {
+      this.selfVideo.nativeElement.src = window.URL.createObjectURL(stream);
+      this.selfVideo.nativeElement.play();
+
       this.peer = new Peer({
         initiator: this.viewCtrl.name === 'HomePage',
         trickle: false,
