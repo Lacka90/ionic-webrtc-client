@@ -2,7 +2,7 @@ import { Injectable } from '@angular/core';
 import { Http } from '@angular/http';
 import 'rxjs/add/operator/map';
 
-export const API_BASE = 'https://5da4f996.ngrok.io/api/v1';
+export const API_BASE = '/api/v1';
 
 @Injectable()
 export class ApiService {
