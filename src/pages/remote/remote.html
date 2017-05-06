@@ -7,14 +7,17 @@
 <ion-header>
 
   <ion-navbar>
-    <ion-title>remote</ion-title>
+    <ion-title>Remote</ion-title>
   </ion-navbar>
 
 </ion-header>
 
 
 <ion-content padding>
-  <video #localVideo autoplay muted></video>
+  <div class="video-container">
+    <video class="remote-video" #localVideo autoplay muted></video>
+    <video class="self-video" #selfVideo autoplay muted></video>
+  </div>
   <div *ngIf="!selectedUser">
     <ion-list>
       <ion-item *ngFor="let user of users" (click)="connect(user)">

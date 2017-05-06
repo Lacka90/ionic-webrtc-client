@@ -7,8 +7,10 @@
 </ion-header>
 
 <ion-content padding>
-  Remote
-  {{ user.username }}
+  Logged in {{ user.username }}
 
-  <video #localVideo autoplay muted></video>
+  <div class="video-container">
+    <video class="remote-video" #localVideo autoplay muted></video>
+    <video class="self-video" #selfVideo autoplay muted></video>
+  </div>
 </ion-content>

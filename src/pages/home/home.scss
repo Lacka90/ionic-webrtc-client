@@ -1,5 +1,17 @@
 page-home {
-  video {
+  .video-container {
+    position: relative;
+    background-color: lightgray;
+  }
+
+  .remote-video {
     width: 100%;
+  }
+
+  .self-video {
+    width: 40%;
+    position: absolute;
+    top: 0;
+    right: 0;
   }
 }
