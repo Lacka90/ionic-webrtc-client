@@ -64,7 +64,11 @@ export class HomePage implements OnDestroy {
   getRoom() {
     return this.userService.getRoom().toPromise().then(({ room }) => {
       if (!room.answer) {
-        return this.getRoom();
+        return new Promise((resolve) => {
+          setTimeout(() => {
+            resolve(this.getRoom());
+          }, 2000);
+        });
       }
       return room;
     });
