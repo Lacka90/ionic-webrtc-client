@@ -23,6 +23,7 @@ export class HomePage implements OnDestroy {
 
   private user = {};
   private peer;
+  private getTimeoutId = null;
 
   constructor(
     public navCtrl: NavController,
@@ -65,7 +66,7 @@ export class HomePage implements OnDestroy {
     return this.userService.getRoom().toPromise().then(({ room }) => {
       if (!room.answer) {
         return new Promise((resolve) => {
-          setTimeout(() => {
+          this.getTimeoutId = setTimeout(() => {
             resolve(this.getRoom());
           }, 2000);
         });
@@ -78,5 +79,9 @@ export class HomePage implements OnDestroy {
     this.peer.signal(JSON.parse(answer));
   }
 
-  ngOnDestroy() {}
+  ngOnDestroy() {
+    if (this.getTimeoutId) {
+      clearTimeout(this.getTimeoutId);
+    }
+  }
 }
