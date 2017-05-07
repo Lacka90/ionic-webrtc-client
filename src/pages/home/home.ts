@@ -38,7 +38,7 @@ export class HomePage implements OnDestroy {
       this.selfVideo.nativeElement.play();
 
       this.peer = new Peer({
-        initiator: this.viewCtrl.name === 'HomePage',
+        initiator: true,
         trickle: false,
         reconnectTimer: 60000,
         stream,
