@@ -5,7 +5,7 @@ import * as io from 'socket.io-client';
 
 @Injectable()
 export class SocketService {
-  private url = 'http://localhost:3000';
+  private url = location.origin;
   private socket = null;
 
   constructor(private userService: UserService) {
