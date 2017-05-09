@@ -5,21 +5,23 @@
 </ion-header>
 
 <ion-content padding>
-  <ion-list>
+  <form [formGroup]="signupForm" (ngSubmit)="signup()">
+    <ion-list>
 
-    <ion-item>
-      <ion-label floating>Username</ion-label>
-      <ion-input [(ngModel)]="username" type="text"></ion-input>
-    </ion-item>
+      <ion-item>
+        <ion-label floating>Username</ion-label>
+        <ion-input formControlName="username" type="text"></ion-input>
+      </ion-item>
 
-    <ion-item>
-      <ion-label floating>Password</ion-label>
-      <ion-input [(ngModel)]="password" type="password"></ion-input>
-    </ion-item>
+      <ion-item>
+        <ion-label floating>Password</ion-label>
+        <ion-input formControlName="password" type="password"></ion-input>
+      </ion-item>
 
-  </ion-list>
+    </ion-list>
 
-  <div padding>
-    <button ion-button full (click)="signup(username, password)">Sign up</button>
-  </div>
+    <div>
+      <button type="submit" ion-button full>Sign up</button>
+    </div>
+  </form>
 </ion-content>

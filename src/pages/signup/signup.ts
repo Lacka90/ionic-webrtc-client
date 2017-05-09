@@ -1,6 +1,8 @@
-import { Component } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
+import { FormBuilder, Validators, FormGroup } from '@angular/forms'
 import { NavController } from 'ionic-angular';
 import { UserService } from '../../common/user';
+import { ErrorService } from '../../util/error/errorService';
 import { Login } from '../login/login';
 
 /**
@@ -13,16 +15,29 @@ import { Login } from '../login/login';
   selector: 'page-signup',
   templateUrl: 'signup.html',
 })
-export class Signup {
+export class Signup implements OnInit {
+  private signupForm: FormGroup = null;
 
   constructor(
     public navCtrl: NavController,
-    private userService: UserService
+    private userService: UserService,
+    private errorService: ErrorService,
+    private fb: FormBuilder
   ) {}
 
-  signup(username: string, password: string) {
-    this.userService.register(username, password).subscribe(() => {
+  ngOnInit() {
+    this.signupForm = this.fb.group({
+      username: ['', Validators.required],
+      password: ['', Validators.required]
+    });
+  }
+
+  signup() {
+    const formValues = this.signupForm.value;
+    this.userService.register(formValues.username, formValues.password).subscribe(() => {
       this.navCtrl.push(Login);
+    }, (err) => {
+      this.errorService.makeAlert(err);
     });
   }
 

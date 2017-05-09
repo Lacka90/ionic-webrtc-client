@@ -6,6 +6,8 @@ import { SplashScreen } from '@ionic-native/splash-screen';
 import { StatusBar } from '@ionic-native/status-bar';
 
 import { httpFactory } from '../util/http/JwtHttp';
+import { ErrorService } from '../util/error/errorService';
+import { SocketService } from './../services/socketService';
 
 import { MyApp } from './app.component';
 import { HomePage } from '../pages/home/home';
@@ -43,6 +45,8 @@ import { UserService } from '../common/user';
     {provide: ErrorHandler, useClass: IonicErrorHandler},
     ApiService,
     UserService,
+    ErrorService,
+    SocketService,
     {
       provide: Http,
       useFactory: httpFactory,

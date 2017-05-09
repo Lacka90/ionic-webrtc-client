@@ -1,3 +1,4 @@
+import { SocketService } from './../../services/socketService';
 import { Component, ViewChild, OnDestroy } from '@angular/core';
 import { NavController, ViewController } from 'ionic-angular';
 import { UserService } from '../../common/user';
@@ -28,6 +29,7 @@ export class HomePage implements OnDestroy {
   constructor(
     public navCtrl: NavController,
     private viewCtrl: ViewController,
+    private socketService: SocketService,
     private userService: UserService
   ) {
     this.userService.getUser().then((user) => {
@@ -49,8 +51,11 @@ export class HomePage implements OnDestroy {
         const connection = JSON.stringify(data);
 
         this.userService.offerRoom(connection).subscribe((result) => {
-          this.getRoom().then((room) => {
-            this.connect(room.answer);
+          this.socketService.answerRoom().subscribe((data) => {
+            const answerString = data['answer'];
+            if (answerString) {
+              this.connect(answerString);
+            }
           });
         });
       });
