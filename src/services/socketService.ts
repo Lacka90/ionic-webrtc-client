@@ -10,10 +10,6 @@ export class SocketService {
 
   constructor(private userService: UserService) {
     this.socket = io(this.url);
-
-    this.socket.on('connect', (data) => {
-      this.updateSocketAtLogin();
-    });
   }
 
   updateSocketAtLogin() {
@@ -30,7 +26,29 @@ export class SocketService {
 
   answerRoom() {
     return new Observable(observer => {
+      this.socket.on('userCalling', (data) => {
+        observer.next(data);
+      });
+      return () => {
+        this.socket.disconnect();
+      };
+    });
+  }
+
+  userConnected() {
+    return new Observable(observer => {
       this.socket.on('userConnected', (data) => {
+        observer.next(data);
+      });
+      return () => {
+        this.socket.disconnect();
+      };
+    });
+  }
+
+  userDisconnected() {
+    return new Observable(observer => {
+      this.socket.on('userDisconnected', (data) => {
         observer.next(data);
       });
       return () => {

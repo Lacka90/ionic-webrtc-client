@@ -1,7 +1,9 @@
+import { SocketService } from './../../services/socketService';
 import { Component, ViewChild, OnDestroy } from '@angular/core';
 import { NavController, NavParams, ViewController } from 'ionic-angular';
 import { UserService } from '../../common/user';
 import * as Peer from 'simple-peer';
+import * as _ from 'lodash';
 
 const VIDEO_CONSTRAINTS = {
   audio: true,
@@ -26,10 +28,25 @@ export class Remote implements OnDestroy {
     public navCtrl: NavController,
     public navParams: NavParams,
     private viewCtrl: ViewController,
+    private socketService: SocketService,
     private userService: UserService
   ) {
     this.userService.getAvailableUsers().subscribe(({ users }) => {
       this.users = users;
+    });
+
+    this.socketService.userConnected().subscribe((data) => {
+      const user = data['user'];
+      if (user) {
+        this.users.push(user);
+      }
+    });
+
+    this.socketService.userDisconnected().subscribe((data) => {
+      const userId = data['userId'];
+      if (userId) {
+        this.users = _.filter(this.users, (user) => user['_id'] !== userId);
+      }
     });
 
     navigator.getUserMedia(VIDEO_CONSTRAINTS, (stream) => {
