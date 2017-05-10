@@ -75,6 +75,10 @@ export class Remote implements OnDestroy {
           console.error(err);
         }
       })
+
+      this.peer.on('close', (stream) => {
+        this.calling = false;
+      });
     }, err => console.error(err));
   }
 

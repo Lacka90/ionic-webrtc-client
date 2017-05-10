@@ -85,6 +85,10 @@ export class HomePage implements OnDestroy {
           console.log(err);
         }
       });
+
+      this.peer.on('close', (stream) => {
+        this.calling = false;
+      });
     }, err => console.error(err));
   }
 
