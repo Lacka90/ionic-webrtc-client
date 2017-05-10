@@ -1,6 +1,6 @@
 import { SocketService } from './../../services/socketService';
 import { Component, ViewChild, OnDestroy } from '@angular/core';
-import { NavController, NavParams, ViewController } from 'ionic-angular';
+import { NavController, NavParams, ViewController, AlertController } from 'ionic-angular';
 import { UserService } from '../../common/user';
 import * as Peer from 'simple-peer';
 import * as _ from 'lodash';
@@ -29,14 +29,10 @@ export class Remote implements OnDestroy {
     public navParams: NavParams,
     private viewCtrl: ViewController,
     private socketService: SocketService,
+    private alertCtrl: AlertController,
     private userService: UserService
   ) {
-    this.userService.getAvailableUsers().subscribe(({ users }) => {
-      this.users = users;
-    });
-
     this.socketService.userConnected().subscribe((data) => {
-      debugger;
       const user = data['user'];
       if (user) {
         this.users.push(user);
@@ -44,7 +40,6 @@ export class Remote implements OnDestroy {
     });
 
     this.socketService.userDisconnected().subscribe((data) => {
-      debugger;
       const userId = data['userId'];
       if (userId) {
         this.users = _.filter(this.users, (user) => user['_id'] !== userId);
@@ -57,7 +52,7 @@ export class Remote implements OnDestroy {
       try {
         this.selfVideo.nativeElement.play();
       } catch (err) {
-        console.log(err);
+        console.error(err);
       }
 
       this.peer = new Peer({
@@ -73,7 +68,7 @@ export class Remote implements OnDestroy {
         this.userService.answerRoom(this.selectedUser._id, connection).subscribe((result) => {
           console.log(result);
         }, (err) => {
-          debugger;
+          console.error(err);
         });
       });
 
@@ -82,14 +77,38 @@ export class Remote implements OnDestroy {
         try {
           this.localVideo.nativeElement.play();
         } catch (err) {
-          console.log(err);
+          console.error(err);
         }
       })
     }, err => console.error(err));
   }
 
+  showUsers() {
+    this.userService.getAvailableUsers().subscribe(({ users }) => {
+      const options = {
+        title: 'Select user',
+        buttons: [],
+        handler: (data) => {
+          this.connect(data);
+          debugger;
+        }
+      };
+
+      options['inputs'] = users.map((user) => {
+        return { name : 'options', value: user, label: user.username, type: 'button' };
+      });
+
+      let alert = this.alertCtrl.create(options);
+      alert.present();
+    });
+  }
+
+  hang() {
+    this.peer.destroy();
+  }
+
   ngOnDestroy() {
-    // remove data from DB
+    this.hang();
   }
 
   connect(user) {

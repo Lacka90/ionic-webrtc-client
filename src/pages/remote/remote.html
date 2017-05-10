@@ -8,6 +8,12 @@
 
   <ion-navbar>
     <ion-title>Remote</ion-title>
+
+    <ion-buttons end>
+      <button (click)="showUsers()">
+        <ion-icon name="people"></ion-icon>
+      </button>
+    </ion-buttons>
   </ion-navbar>
 
 </ion-header>
@@ -15,9 +21,16 @@
 
 <ion-content padding>
   <div class="video-container">
-    <video class="remote-video" #localVideo autoplay muted></video>
+    <video class="remote-video" #localVideo autoplay [hidden]="!calling"></video>
     <video class="self-video" #selfVideo autoplay muted></video>
   </div>
+
+  <ion-fab bottom center *ngIf="calling">
+    <button ion-fab color="danger" (click)="hang()">
+      <ion-icon name="hand"></ion-icon>
+    </button>
+  </ion-fab>
+
   <div *ngIf="!selectedUser">
     <ion-list>
       <ion-item *ngFor="let user of users" (click)="connect(user)">

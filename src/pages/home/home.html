@@ -1,16 +1,14 @@
 <ion-header>
   <ion-navbar>
     <ion-title>
-      Ionic WebRTC client
+      {{ user.username }}
     </ion-title>
   </ion-navbar>
 </ion-header>
 
 <ion-content padding>
-  Logged in {{ user.username }}
-
   <div class="video-container">
-    <video class="remote-video" #localVideo autoplay muted></video>
+    <video class="remote-video" #localVideo autoplay [hidden]="!calling"></video>
     <video class="self-video" #selfVideo autoplay muted></video>
   </div>
 
