@@ -4,6 +4,7 @@ import { NavController, ViewController, AlertController } from 'ionic-angular';
 import { UserService } from '../../common/user';
 import * as Peer from 'simple-peer';
 import 'rxjs/add/operator/toPromise';
+import { Subscription } from 'rxjs/Subscription';
 
 const VIDEO_CONSTRAINTS = {
   audio: true,
@@ -25,6 +26,8 @@ export class HomePage implements OnDestroy {
   private peer;
   private calling = false;
   private muted = false;
+  private offer$: Subscription = null;
+  private answer$: Subscription = null;
 
   constructor(
     public navCtrl: NavController,
@@ -60,8 +63,8 @@ export class HomePage implements OnDestroy {
         const connection = JSON.stringify(data);
 
         this.userService.getUser().then((user) => {
-          this.userService.offerRoom(user._id, connection).subscribe((result) => {
-            this.socketService.answerRoom().subscribe((data) => {
+          this.offer$ = this.userService.offerRoom(user._id, connection).subscribe((result) => {
+            this.answer$ = this.socketService.answerRoom().subscribe((data) => {
               const answerString = data['answer'];
 
               if (answerString) {
@@ -116,6 +119,12 @@ export class HomePage implements OnDestroy {
   }
 
   hang() {
+    if (this.offer$) {
+      this.offer$.unsubscribe();
+    }
+    if (this.answer$) {
+      this.answer$.unsubscribe();
+    }
     this.calling = false;
     this.peer.destroy();
     this.initPeer();

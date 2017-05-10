@@ -2,6 +2,7 @@ import { SocketService } from './../../services/socketService';
 import { Component, ViewChild, OnDestroy } from '@angular/core';
 import { NavController, NavParams, ViewController, AlertController } from 'ionic-angular';
 import { UserService } from '../../common/user';
+import { Subscription } from 'rxjs/Subscription';
 import * as Peer from 'simple-peer';
 import * as _ from 'lodash';
 
@@ -25,6 +26,7 @@ export class Remote implements OnDestroy {
   private peer;
   private calling = false;
   private muted = false;
+  private answer$: Subscription = null;
 
   constructor(
     public navCtrl: NavController,
@@ -34,20 +36,6 @@ export class Remote implements OnDestroy {
     private alertCtrl: AlertController,
     private userService: UserService
   ) {
-    this.socketService.userConnected().subscribe((data) => {
-      const user = data['user'];
-      if (user) {
-        this.users.push(user);
-      }
-    });
-
-    this.socketService.userDisconnected().subscribe((data) => {
-      const userId = data['userId'];
-      if (userId) {
-        this.users = _.filter(this.users, (user) => user['_id'] !== userId);
-      }
-    });
-
     this.initPeer();
   }
 
@@ -71,7 +59,7 @@ export class Remote implements OnDestroy {
       this.peer.on('signal', (data) => {
         const connection = JSON.stringify(data);
         console.log("REMOTE", connection);
-        this.userService.answerRoom(this.selectedUser._id, connection).subscribe((result) => {
+        this.answer$ = this.userService.answerRoom(this.selectedUser._id, connection).subscribe((result) => {
           console.log(result);
         }, (err) => {
           console.error(err);
@@ -91,12 +79,29 @@ export class Remote implements OnDestroy {
   }
 
   showUsers() {
-    this.userService.getAvailableUsers().subscribe(({ users }) => {
+    const connected$ = this.socketService.userConnected().subscribe((data) => {
+      const user = data['user'];
+      if (user) {
+        this.users.push(user);
+      }
+    });
+
+    const disConnected$ = this.socketService.userDisconnected().subscribe((data) => {
+      const userId = data['userId'];
+      if (userId) {
+        this.users = _.filter(this.users, (user) => user['_id'] !== userId);
+      }
+    });
+
+    const available$ = this.userService.getAvailableUsers().subscribe(({ users }) => {
       const options = {
         title: 'Select user',
         buttons: [{
           text: 'Select',
           handler: (data) => {
+            connected$.unsubscribe();
+            disConnected$.unsubscribe();
+            available$.unsubscribe();
             this.connect(data);
           }
         }],
@@ -117,6 +122,9 @@ export class Remote implements OnDestroy {
   }
 
   hang() {
+    if (this.answer$) {
+      this.answer$.unsubscribe();
+    }
     this.calling = true;
     this.peer.destroy();
     this.initPeer();
