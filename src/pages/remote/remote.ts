@@ -67,13 +67,13 @@ export class Remote implements OnDestroy {
       });
 
       this.peer.on('stream', (stream) => {
+        this.calling = true;
         this.localVideo.nativeElement.src = window.URL.createObjectURL(stream);
         try {
           this.localVideo.nativeElement.play();
         } catch (err) {
           console.error(err);
         }
-        this.calling = true;
       })
     }, err => console.error(err));
   }
@@ -125,7 +125,7 @@ export class Remote implements OnDestroy {
     if (this.answer$) {
       this.answer$.unsubscribe();
     }
-    this.calling = true;
+    this.calling = false;
     this.peer.destroy();
     this.initPeer();
   }
