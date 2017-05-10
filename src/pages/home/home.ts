@@ -1,6 +1,6 @@
 import { SocketService } from './../../services/socketService';
 import { Component, ViewChild, OnDestroy } from '@angular/core';
-import { NavController, ViewController } from 'ionic-angular';
+import { NavController, ViewController, AlertController } from 'ionic-angular';
 import { UserService } from '../../common/user';
 import * as Peer from 'simple-peer';
 import 'rxjs/add/operator/toPromise';
@@ -20,16 +20,16 @@ const VIDEO_CONSTRAINTS = {
 export class HomePage implements OnDestroy {
   @ViewChild('localVideo') localVideo;
   @ViewChild('selfVideo') selfVideo;
-  @ViewChild('textarea') textarea;
 
   private user = {};
   private peer;
-  private getTimeoutId = null;
+  private calling = false;
 
   constructor(
     public navCtrl: NavController,
     private viewCtrl: ViewController,
     private socketService: SocketService,
+    private alertCtrl: AlertController,
     private userService: UserService
   ) {
     this.userService.getUser().then((user) => {
@@ -58,8 +58,9 @@ export class HomePage implements OnDestroy {
           this.userService.offerRoom(user._id, connection).subscribe((result) => {
             this.socketService.answerRoom().subscribe((data) => {
               const answerString = data['answer'];
+
               if (answerString) {
-                this.connect(answerString);
+                this.callConfirm(answerString);
               }
             });
           }, (err) => {
@@ -79,17 +80,33 @@ export class HomePage implements OnDestroy {
     }, err => console.error(err));
   }
 
-  getRoom() {
-    return this.userService.getRoom().toPromise().then(({ room }) => {
-      if (!room.answer) {
-        return new Promise((resolve) => {
-          this.getTimeoutId = setTimeout(() => {
-            resolve(this.getRoom());
-          }, 2000);
-        });
-      }
-      return room;
+  callConfirm(answer: string) {
+    let alert = this.alertCtrl.create({
+      title: 'Incoming call',
+      message: 'Do you want to receive?',
+      buttons: [
+        {
+          text: 'No',
+          role: 'cancel',
+          handler: () => {
+            this.calling = false;
+            console.log('Cancel clicked');
+          }
+        },
+        {
+          text: 'Yes',
+          handler: () => {
+            this.connect(answer);
+            this.calling = true;
+          }
+        }
+      ]
     });
+    alert.present();
+  }
+
+  hang() {
+    this.peer.destroy();
   }
 
   connect(answer: string) {
@@ -97,8 +114,7 @@ export class HomePage implements OnDestroy {
   }
 
   ngOnDestroy() {
-    if (this.getTimeoutId) {
-      clearTimeout(this.getTimeoutId);
-    }
+    this.hang();
+    this.calling = false;
   }
 }

@@ -13,4 +13,10 @@
     <video class="remote-video" #localVideo autoplay muted></video>
     <video class="self-video" #selfVideo autoplay muted></video>
   </div>
+
+  <ion-fab bottom center *ngIf="calling">
+    <button ion-fab color="danger" (click)="hang()">
+      <ion-icon name="hand"></ion-icon>
+    </button>
+  </ion-fab>
 </ion-content>
