@@ -36,6 +36,7 @@ export class Remote implements OnDestroy {
     });
 
     this.socketService.userConnected().subscribe((data) => {
+      debugger;
       const user = data['user'];
       if (user) {
         this.users.push(user);
@@ -43,6 +44,7 @@ export class Remote implements OnDestroy {
     });
 
     this.socketService.userDisconnected().subscribe((data) => {
+      debugger;
       const userId = data['userId'];
       if (userId) {
         this.users = _.filter(this.users, (user) => user['_id'] !== userId);
