@@ -53,7 +53,12 @@ export class Remote implements OnDestroy {
 
     navigator.getUserMedia(VIDEO_CONSTRAINTS, (stream) => {
       this.selfVideo.nativeElement.src = window.URL.createObjectURL(stream);
-      this.selfVideo.nativeElement.play();
+
+      try {
+        this.selfVideo.nativeElement.play();
+      } catch (err) {
+        console.log(err);
+      }
 
       this.peer = new Peer({
         initiator: false,
@@ -74,7 +79,11 @@ export class Remote implements OnDestroy {
 
       this.peer.on('stream', (stream) => {
         this.localVideo.nativeElement.src = window.URL.createObjectURL(stream);
-        this.localVideo.nativeElement.play();
+        try {
+          this.localVideo.nativeElement.play();
+        } catch (err) {
+          console.log(err);
+        }
       })
     }, err => console.error(err));
   }
