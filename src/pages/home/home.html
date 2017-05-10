@@ -17,4 +17,11 @@
       <ion-icon name="hand"></ion-icon>
     </button>
   </ion-fab>
+
+  <ion-fab bottom left *ngIf="calling">
+    <button ion-fab color="primary" (click)="muteToggle()">
+      <ion-icon name="mic" *ngIf="muted"></ion-icon>
+      <ion-icon name="mic-off" *ngIf="!muted"></ion-icon>
+    </button>
+  </ion-fab>
 </ion-content>

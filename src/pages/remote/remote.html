@@ -31,12 +31,10 @@
     </button>
   </ion-fab>
 
-  <div *ngIf="!selectedUser">
-    <ion-list>
-      <ion-item *ngFor="let user of users" (click)="connect(user)">
-        {{ user.username }}
-        {{ user.connection }}
-      </ion-item>
-    </ion-list>
-  </div>
+  <ion-fab bottom left *ngIf="calling">
+    <button ion-fab color="primary" (click)="muteToggle()">
+      <ion-icon name="mic" *ngIf="muted"></ion-icon>
+      <ion-icon name="mic-off" *ngIf="!muted"></ion-icon>
+    </button>
+  </ion-fab>
 </ion-content>

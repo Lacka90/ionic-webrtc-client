@@ -24,6 +24,7 @@ export class HomePage implements OnDestroy {
   private user = {};
   private peer;
   private calling = false;
+  private muted = false;
 
   constructor(
     public navCtrl: NavController,
@@ -36,6 +37,10 @@ export class HomePage implements OnDestroy {
       this.user = user;
     });
 
+    this.initPeer();
+  }
+
+  initPeer() {
     navigator.getUserMedia(VIDEO_CONSTRAINTS, (stream) => {
       this.selfVideo.nativeElement.src = window.URL.createObjectURL(stream);
       try {
@@ -64,7 +69,7 @@ export class HomePage implements OnDestroy {
               }
             });
           }, (err) => {
-            debugger;
+            console.error(err);
           });
         });
       });
@@ -105,8 +110,15 @@ export class HomePage implements OnDestroy {
     alert.present();
   }
 
+  muteToggle() {
+    this.muted = !this.muted;
+    this.localVideo.nativeElement.muted = this.muted;
+  }
+
   hang() {
+    this.calling = false;
     this.peer.destroy();
+    this.initPeer();
   }
 
   connect(answer: string) {
@@ -115,6 +127,5 @@ export class HomePage implements OnDestroy {
 
   ngOnDestroy() {
     this.hang();
-    this.calling = false;
   }
 }

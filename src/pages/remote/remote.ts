@@ -23,6 +23,8 @@ export class Remote implements OnDestroy {
   private selectedUser;
   private users = null;
   private peer;
+  private calling = false;
+  private muted = false;
 
   constructor(
     public navCtrl: NavController,
@@ -46,6 +48,10 @@ export class Remote implements OnDestroy {
       }
     });
 
+    this.initPeer();
+  }
+
+  initPeer() {
     navigator.getUserMedia(VIDEO_CONSTRAINTS, (stream) => {
       this.selfVideo.nativeElement.src = window.URL.createObjectURL(stream);
 
@@ -79,6 +85,7 @@ export class Remote implements OnDestroy {
         } catch (err) {
           console.error(err);
         }
+        this.calling = true;
       })
     }, err => console.error(err));
   }
@@ -87,15 +94,16 @@ export class Remote implements OnDestroy {
     this.userService.getAvailableUsers().subscribe(({ users }) => {
       const options = {
         title: 'Select user',
-        buttons: [],
-        handler: (data) => {
-          this.connect(data);
-          debugger;
-        }
+        buttons: [{
+          text: 'Select',
+          handler: (data) => {
+            this.connect(data);
+          }
+        }],
       };
 
       options['inputs'] = users.map((user) => {
-        return { name : 'options', value: user, label: user.username, type: 'button' };
+        return { name : 'options', value: user, label: user.username, type: 'radio' };
       });
 
       let alert = this.alertCtrl.create(options);
@@ -103,8 +111,15 @@ export class Remote implements OnDestroy {
     });
   }
 
+  muteToggle() {
+    this.muted = !this.muted;
+    this.localVideo.nativeElement.muted = this.muted;
+  }
+
   hang() {
+    this.calling = true;
     this.peer.destroy();
+    this.initPeer();
   }
 
   ngOnDestroy() {

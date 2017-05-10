@@ -27,7 +27,6 @@ export class SocketService {
   answerRoom() {
     return new Observable(observer => {
       this.socket.on('userCalling', (data) => {
-        debugger;
         observer.next(data);
       });
       return () => {
@@ -39,7 +38,6 @@ export class SocketService {
   userConnected() {
     return new Observable(observer => {
       this.socket.on('userConnected', (data) => {
-        debugger;
         observer.next(data);
       });
       return () => {
@@ -51,7 +49,6 @@ export class SocketService {
   userDisconnected() {
     return new Observable(observer => {
       this.socket.on('userDisconnected', (data) => {
-        debugger;
         observer.next(data);
       });
       return () => {
