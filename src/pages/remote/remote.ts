@@ -67,6 +67,8 @@ export class Remote implements OnDestroy {
         console.log("REMOTE", connection);
         this.userService.answerRoom(this.selectedUser._id, connection).subscribe((result) => {
           console.log(result);
+        }, (err) => {
+          debugger;
         });
       });
 

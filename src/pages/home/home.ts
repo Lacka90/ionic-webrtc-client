@@ -50,12 +50,16 @@ export class HomePage implements OnDestroy {
       this.peer.on('signal', (data) => {
         const connection = JSON.stringify(data);
 
-        this.userService.offerRoom(connection).subscribe((result) => {
-          this.socketService.answerRoom().subscribe((data) => {
-            const answerString = data['answer'];
-            if (answerString) {
-              this.connect(answerString);
-            }
+        this.userService.getUser().then((user) => {
+          this.userService.offerRoom(user._id, connection).subscribe((result) => {
+            this.socketService.answerRoom().subscribe((data) => {
+              const answerString = data['answer'];
+              if (answerString) {
+                this.connect(answerString);
+              }
+            });
+          }, (err) => {
+            debugger;
           });
         });
       });

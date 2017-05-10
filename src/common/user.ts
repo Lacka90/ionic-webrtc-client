@@ -34,8 +34,8 @@ export class UserService {
     return this.api.register(username, password);
   }
 
-  offerRoom(connection: string) {
-    return this.api.offerRoom(connection);
+  offerRoom(userId: string, connection: string) {
+    return this.api.offerRoom(userId, connection);
   }
 
   answerRoom(userId: string, connection: string) {

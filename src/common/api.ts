@@ -42,8 +42,8 @@ export class ApiService {
       .map((response) => response.json());
   }
 
-  offerRoom(connection: string) {
-    return this.http.post(`/user/room/offer`, { connection })
+  offerRoom(userId: string, connection: string) {
+    return this.http.post(`/user/room/offer`, { userId, connection })
       .map((response) => response.json());
   }
 
