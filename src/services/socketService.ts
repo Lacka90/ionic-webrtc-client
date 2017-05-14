@@ -29,9 +29,9 @@ export class SocketService {
       this.socket.on('userCalling', (data) => {
         observer.next(data);
       });
-      return () => {
-        this.socket.disconnect();
-      };
+      // return () => {
+      //   this.socket.disconnect();
+      // };
     });
   }
 
@@ -40,9 +40,9 @@ export class SocketService {
       this.socket.on('userConnected', (data) => {
         observer.next(data);
       });
-      return () => {
-        this.socket.disconnect();
-      };
+      // return () => {
+      //   this.socket.disconnect();
+      // };
     });
   }
 

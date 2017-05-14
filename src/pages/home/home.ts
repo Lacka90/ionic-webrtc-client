@@ -1,5 +1,5 @@
 import { SocketService } from './../../services/socketService';
-import { Component, ViewChild, OnDestroy } from '@angular/core';
+import { Component, ViewChild, OnDestroy, NgZone } from '@angular/core';
 import { NavController, ViewController, AlertController } from 'ionic-angular';
 import { UserService } from '../../common/user';
 import * as Peer from 'simple-peer';
@@ -34,7 +34,8 @@ export class HomePage implements OnDestroy {
     private viewCtrl: ViewController,
     private socketService: SocketService,
     private alertCtrl: AlertController,
-    private userService: UserService
+    private userService: UserService,
+    private zone: NgZone
   ) {
     this.userService.getUser().then((user) => {
       this.user = user;
@@ -86,8 +87,16 @@ export class HomePage implements OnDestroy {
         }
       });
 
-      this.peer.on('close', (stream) => {
-        this.calling = false;
+      this.peer.on('error', (err) => {
+        alert(err);
+      });
+
+      this.peer.on('close', () => {
+        if (this.calling) {
+          this.zone.run(() => {
+            this.hang();
+          });
+        }
       });
     }, err => console.error(err));
   }
@@ -123,13 +132,14 @@ export class HomePage implements OnDestroy {
   }
 
   hang() {
+    this.calling = false;
     if (this.offer$) {
       this.offer$.unsubscribe();
     }
+
     if (this.answer$) {
       this.answer$.unsubscribe();
     }
-    this.calling = false;
     this.peer.destroy();
     this.initPeer();
   }

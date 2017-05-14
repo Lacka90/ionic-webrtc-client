@@ -1,5 +1,5 @@
 import { SocketService } from './../../services/socketService';
-import { Component, ViewChild, OnDestroy } from '@angular/core';
+import { Component, ViewChild, OnDestroy, NgZone } from '@angular/core';
 import { NavController, NavParams, ViewController, AlertController } from 'ionic-angular';
 import { UserService } from '../../common/user';
 import { Subscription } from 'rxjs/Subscription';
@@ -34,7 +34,8 @@ export class Remote implements OnDestroy {
     private viewCtrl: ViewController,
     private socketService: SocketService,
     private alertCtrl: AlertController,
-    private userService: UserService
+    private userService: UserService,
+    private zone: NgZone
   ) {
     this.initPeer();
   }
@@ -74,10 +75,18 @@ export class Remote implements OnDestroy {
         } catch (err) {
           console.error(err);
         }
-      })
+      });
 
-      this.peer.on('close', (stream) => {
-        this.calling = false;
+      this.peer.on('error', (err) => {
+        alert(err);
+      });
+
+      this.peer.on('close', () => {
+        if (this.calling) {
+          this.zone.run(() => {
+            this.hang();
+          });
+        }
       });
     }, err => console.error(err));
   }
@@ -126,10 +135,10 @@ export class Remote implements OnDestroy {
   }
 
   hang() {
+    this.calling = false;
     if (this.answer$) {
       this.answer$.unsubscribe();
     }
-    this.calling = false;
     this.peer.destroy();
     this.initPeer();
   }
