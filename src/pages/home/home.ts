@@ -64,7 +64,7 @@ export class HomePage implements OnDestroy {
         const connection = JSON.stringify(data);
 
         this.userService.getUser().then((user) => {
-          this.offer$ = this.userService.offerRoom(user._id, connection).subscribe((result) => {
+          this.offer$ = this.userService.offerRoom(user.id, connection).subscribe((result) => {
             this.answer$ = this.socketService.answerRoom().subscribe((data) => {
               const answerString = data['answer'];
 

@@ -60,7 +60,7 @@ export class Remote implements OnDestroy {
       this.peer.on('signal', (data) => {
         const connection = JSON.stringify(data);
         console.log("REMOTE", connection);
-        this.answer$ = this.userService.answerRoom(this.selectedUser._id, connection).subscribe((result) => {
+        this.answer$ = this.userService.answerRoom(this.selectedUser.id, connection).subscribe((result) => {
           console.log(result);
         }, (err) => {
           console.error(err);
@@ -102,7 +102,7 @@ export class Remote implements OnDestroy {
     const disConnected$ = this.socketService.userDisconnected().subscribe((data) => {
       const userId = data['userId'];
       if (userId) {
-        this.users = _.filter(this.users, (user) => user['_id'] !== userId);
+        this.users = _.filter(this.users, (user) => user['id'] !== userId);
       }
     });
 
@@ -149,7 +149,8 @@ export class Remote implements OnDestroy {
 
   connect(user) {
     this.selectedUser = user;
-    return this.userService.getRoomById(user._id).toPromise().then(({ room }) => {
+    return this.userService.getRoomById(user.id).toPromise().then(({ room }) => {
+      debugger;
       this.peer.signal(room.offer);
     });
   }

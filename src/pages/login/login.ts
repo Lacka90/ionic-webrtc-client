@@ -51,7 +51,7 @@ export class Login implements OnInit, OnDestroy {
     this.userService.getUser()
     .then((user) => {
       this.user = user;
-      this.socketService.updateSocketAtLogin();
+      this.socketService.initSocket();
     })
     .catch((err) => {
       this.errorService.makeAlert(err);

@@ -8,20 +8,22 @@ export class SocketService {
   private url = location.origin;
   private socket = null;
 
-  constructor(private userService: UserService) {
-    this.socket = io(this.url);
-  }
+  constructor(private userService: UserService) {}
 
-  updateSocketAtLogin() {
+  initSocket() {
     this.userService.getUser().then(user => {
       if (user) {
-        this.socket.emit('socketChange', { userId : user._id });
+        this.socket = io(this.url, { query: `userId=${user.id}` });
+      } else {
+        this.socket = null;
       }
     });
   }
 
-  sendMessage(message){
-    this.socket.emit('add-message', message);
+  sendMessage(message) {
+    if (this.socket) {
+      this.socket.emit('add-message', message);
+    }
   }
 
   answerRoom() {

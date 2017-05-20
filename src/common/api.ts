@@ -33,22 +33,22 @@ export class ApiService {
   }
 
   getRoom() {
-    return this.http.get(`/user/room`)
+    return this.http.get(`/room`)
       .map((response) => response.json());
   }
 
   getRoomById(userId: string) {
-    return this.http.get(`/user/room/${userId}`)
+    return this.http.get(`/room/${userId}`)
       .map((response) => response.json());
   }
 
   offerRoom(userId: string, connection: string) {
-    return this.http.post(`/user/room/offer`, { userId, connection })
+    return this.http.post(`/room/offer`, { userId, connection })
       .map((response) => response.json());
   }
 
   answerRoom(userId: string, connection: string) {
-    return this.http.put(`/user/room/answer`, { userId, connection })
+    return this.http.post(`/room/answer`, { userId, connection })
       .map((response) => response.json());
   }
 
