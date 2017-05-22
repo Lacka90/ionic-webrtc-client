@@ -26,14 +26,23 @@ export class SocketService {
     }
   }
 
+  sendOffer(userId, connection) {
+    if (this.socket) {
+      this.socket.emit('offerCall', { userId, connection });
+    }
+  }
+
+  sendAnswer(userId, connection) {
+    if (this.socket) {
+      this.socket.emit('answerCall', { userId, connection });
+    }
+  }
+
   answerRoom() {
     return new Observable(observer => {
       this.socket.on('userCalling', (data) => {
         observer.next(data);
       });
-      // return () => {
-      //   this.socket.disconnect();
-      // };
     });
   }
 
@@ -42,9 +51,6 @@ export class SocketService {
       this.socket.on('userConnected', (data) => {
         observer.next(data);
       });
-      // return () => {
-      //   this.socket.disconnect();
-      // };
     });
   }
 
@@ -53,9 +59,6 @@ export class SocketService {
       this.socket.on('userDisconnected', (data) => {
         observer.next(data);
       });
-      return () => {
-        this.socket.disconnect();
-      };
     });
   }
 }

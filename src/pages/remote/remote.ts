@@ -2,7 +2,6 @@ import { SocketService } from './../../services/socketService';
 import { Component, ViewChild, OnDestroy, NgZone } from '@angular/core';
 import { NavController, NavParams, ViewController, AlertController } from 'ionic-angular';
 import { UserService } from '../../common/user';
-import { Subscription } from 'rxjs/Subscription';
 import * as Peer from 'simple-peer';
 import * as _ from 'lodash';
 
@@ -26,7 +25,6 @@ export class Remote implements OnDestroy {
   private peer;
   private calling = false;
   private muted = false;
-  private answer$: Subscription = null;
 
   constructor(
     public navCtrl: NavController,
@@ -59,12 +57,7 @@ export class Remote implements OnDestroy {
 
       this.peer.on('signal', (data) => {
         const connection = JSON.stringify(data);
-        console.log("REMOTE", connection);
-        this.answer$ = this.userService.answerRoom(this.selectedUser.id, connection).subscribe((result) => {
-          console.log(result);
-        }, (err) => {
-          console.error(err);
-        });
+        this.socketService.sendAnswer(this.selectedUser.id, connection);
       });
 
       this.peer.on('stream', (stream) => {
@@ -136,9 +129,6 @@ export class Remote implements OnDestroy {
 
   hang() {
     this.calling = false;
-    if (this.answer$) {
-      this.answer$.unsubscribe();
-    }
     this.peer.destroy();
     this.initPeer();
   }
@@ -150,7 +140,6 @@ export class Remote implements OnDestroy {
   connect(user) {
     this.selectedUser = user;
     return this.userService.getRoomById(user.id).toPromise().then(({ room }) => {
-      debugger;
       this.peer.signal(room.offer);
     });
   }

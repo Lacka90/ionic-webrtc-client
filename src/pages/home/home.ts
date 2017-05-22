@@ -26,7 +26,6 @@ export class HomePage implements OnDestroy {
   private peer;
   private calling = false;
   private muted = false;
-  private offer$: Subscription = null;
   private answer$: Subscription = null;
 
   constructor(
@@ -64,16 +63,13 @@ export class HomePage implements OnDestroy {
         const connection = JSON.stringify(data);
 
         this.userService.getUser().then((user) => {
-          this.offer$ = this.userService.offerRoom(user.id, connection).subscribe((result) => {
-            this.answer$ = this.socketService.answerRoom().subscribe((data) => {
-              const answerString = data['answer'];
+          this.socketService.sendOffer(user.id, connection);
+          this.answer$ = this.socketService.answerRoom().subscribe((data) => {
+            const answerString = data['answer'];
 
-              if (answerString) {
-                this.callConfirm(answerString);
-              }
-            });
-          }, (err) => {
-            console.error(err);
+            if (answerString) {
+              this.callConfirm(answerString);
+            }
           });
         });
       });
@@ -133,9 +129,6 @@ export class HomePage implements OnDestroy {
 
   hang() {
     this.calling = false;
-    if (this.offer$) {
-      this.offer$.unsubscribe();
-    }
 
     if (this.answer$) {
       this.answer$.unsubscribe();
